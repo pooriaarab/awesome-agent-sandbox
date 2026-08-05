@@ -19,11 +19,17 @@ Everything here isolates in one of three ways, and that choice matters more than
 
 Three ways to isolate, weakest to strongest. Everything else in this list picks one, so these names are used throughout.
 
+| Tier                   | How                                  | Overhead             | Run what               |
+| ---------------------- | ------------------------------------ | -------------------- | ---------------------- |
+| **Shared kernel**      | Namespaces, cgroups, syscall filters | None                 | Code you trust         |
+| **Intercepted kernel** | Syscalls served in user space        | Moderate             | Code you mostly trust  |
+| **Separate kernel**    | Own kernel in a virtual machine      | Boot time and memory | Code you did not write |
+
 **Your own code needs a shared kernel at most. A stranger's needs a separate one.** The middle is a business decision, not a technical one.
 
 ### Shared kernel
 
-Same kernel as the host, fenced off with namespaces, cgroups, and syscall filters. Instant and cheap, but a kernel bug is a host compromise.
+> Same kernel as the host, fenced off with namespaces, cgroups, and syscall filters. Instant and cheap, but a kernel bug is a host compromise.
 
 - [runc](https://github.com/opencontainers/runc) - The default, and the baseline this list measures against. Backed by the OCI. ![Stars](https://img.shields.io/github/stars/opencontainers/runc?style=flat-square&label=%20)
 - [Sysbox](https://github.com/nestybox/sysbox) - Hardened runc that runs Docker-in-Docker and systemd safely. The strongest option that still shares a kernel. Backed by Docker. ![Stars](https://img.shields.io/github/stars/nestybox/sysbox?style=flat-square&label=%20)
@@ -32,13 +38,13 @@ Same kernel as the host, fenced off with namespaces, cgroups, and syscall filter
 
 ### Intercepted kernel
 
-Syscalls are reimplemented in user space and never reach the host kernel. No virtualization required, which is why it wins on managed Kubernetes.
+> Syscalls are reimplemented in user space and never reach the host kernel. No virtualization required, which is why it wins on managed Kubernetes.
 
 - [gVisor](https://github.com/google/gvisor) - The only production option here, and the default on Google Kubernetes Engine. Backed by Google. ![Stars](https://img.shields.io/github/stars/google/gvisor?style=flat-square&label=%20)
 
 ### Separate kernel
 
-Its own Linux kernel in a virtual machine. Nothing shared, so an exploit stays in the box. The baseline for code you did not write.
+> Its own Linux kernel in a virtual machine. Nothing shared, so an exploit stays in the box. The baseline for code you did not write.
 
 - [Firecracker](https://github.com/firecracker-microvm/firecracker) - The microVM that created this category, booting in roughly 125ms. Backed by AWS. ![Stars](https://img.shields.io/github/stars/firecracker-microvm/firecracker?style=flat-square&label=%20)
 - [Kata Containers](https://github.com/kata-containers/kata-containers) - The most mature Kubernetes integration, with swappable VMM backends. Add Intel TDX or AMD SEV-SNP when the host operator is also in your threat model. Backed by the OpenInfra Foundation. ![Stars](https://img.shields.io/github/stars/kata-containers/kata-containers?style=flat-square&label=%20)
