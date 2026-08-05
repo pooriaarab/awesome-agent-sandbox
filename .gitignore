@@ -1,0 +1,5 @@
+node_modules/
+.DS_Store
+
+# pending: needs `gh auth refresh -s workflow` before it can be pushed
+.github/workflows/
