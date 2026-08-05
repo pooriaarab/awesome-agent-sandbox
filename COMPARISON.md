@@ -45,7 +45,8 @@ Not competitors. OpenKruise Agents states it maintains compatibility with SIG Ag
 | CRD group | `agents.x-k8s.io` | `agents.kruise.io` | Proprietary |
 | CRDs | 4: `Sandbox`, `SandboxTemplate`, `SandboxWarmPool`, `SandboxClaim` | 10: the above plus `SandboxSet`, `Checkpoint`, `Commit`, `SandboxUpdateOps`, `SecurityProfile`, `TrafficPolicy`, `GlobalTrafficPolicy` | CRD-second; CubeSandbox is migrating from Helm to an operator |
 | Goal | Define the standard — minimal and vendor-neutral | Add production capabilities on top of the standard | Ship a complete platform with SDKs |
-| Differentiators | Warm pools, stable identity, persistent storage | Hibernation and checkpointing of memory, read-write layer, and **GPU memory**; `PauseStrategy: Stop\|Hibernate`; resource pooling and dynamic resize; session identity with traffic routing; multi-replica `SandboxSet` | Browser, code, and desktop form factors; credential vault; unified ingress with per-sandbox egress control |
+| Differentiators | Warm pools, stable identity, persistent storage | Pause and resume, resource pooling and dynamic resize, session identity with traffic routing, multi-replica `SandboxSet` | Browser, code, and desktop form factors; credential vault; unified ingress with per-sandbox egress control |
+| Pause semantics | No pause API | **Deletes the Pod** and rebuilds it on resume from `spec.template` plus a checkpointed pod-template delta. `PauseStrategy: Stop` only — `Hibernate`, `persistentContents`, and GPU-memory checkpointing are declared in the API but [return "not yet supported"](https://github.com/openkruise/agents/blob/master/pkg/controller/sandbox/core/common_control.go) as of August 2026 | Not CRD-driven |
 | External API compatibility | None | **E2B SDK compatible**, plus a [Kubernetes SDK](https://github.com/openkruise/agents-api) | Five first-party language SDKs and an MCP server |
 | Maturity | v0.x, explicitly not production-ready for all workloads | v0.x, earlier still | Validated at scale inside Alibaba and Tencent |
 
@@ -102,7 +103,7 @@ Star counts measure attention, not fitness. Three specific traps in this space:
 | If you need | Choose |
 | --- | --- |
 | Multi-tenant agent platform on your own Kubernetes | `agent-sandbox` with gVisor (balanced) or Kata (strong) |
-| Pause/resume to stop paying while agents idle, or GPU checkpointing | `OpenKruise Agents` |
+| Pause/resume to stop paying while agents idle | `OpenKruise Agents` — but pause deletes the Pod, so in-memory state does not survive |
 | E2B SDK ergonomics with data staying in your network | `OpenKruise Agents` — it speaks the E2B API |
 | A complete platform with minimal integration work | `OpenSandbox` or `CubeSandbox` |
 | Fastest path to shipping, no infrastructure work | `E2B` or `Daytona` |
