@@ -10,7 +10,7 @@ A project does **not** belong here just because it is agent-related. Agent frame
 
 ## Every entry needs
 
-1. **An isolation level** from the table in the README (L0–L5, or Lw). If you cannot determine it from documentation or source, say so in the pull request rather than guessing.
+1. **An isolation model** — one of the three tiers in the README: *shared kernel*, *intercepted kernel*, or *separate kernel*. Add `+ TEE` for hardware confidential computing, say `WebAssembly` where there is no kernel, or say `any` if the project delegates to a RuntimeClass. If you cannot determine it from documentation or source, say so in the pull request rather than guessing.
 2. **A named backer** — a company, a foundation, or "Community". "Unknown" is acceptable; blank is not.
 3. **A one-line reason it is on the list.** What does it do that its neighbours in the table do not? Marketing copy gets rewritten.
 4. **A live star badge**, if it has a public repository:
@@ -40,4 +40,4 @@ Removals are as welcome as additions. Open an issue if a project is abandoned, h
 
 ## Corrections
 
-If an isolation level is wrong, that is a bug worth filing. Getting L3 and L4 confused is exactly the kind of mistake this list exists to prevent.
+If an isolation model is wrong, that is a bug worth filing. Confusing an intercepted kernel with a separate one is exactly the kind of mistake this list exists to prevent.
