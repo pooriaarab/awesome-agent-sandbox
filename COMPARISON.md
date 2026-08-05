@@ -47,7 +47,7 @@ Not competitors. OpenKruise Agents states it maintains compatibility with SIG Ag
 | Goal | Define the standard — minimal and vendor-neutral | Add production capabilities on top of the standard | Ship a complete platform with SDKs |
 | Differentiators | Warm pools, stable identity, persistent storage | Pause and resume, resource pooling and dynamic resize, session identity with traffic routing, multi-replica `SandboxSet` | Browser, code, and desktop form factors; credential vault; unified ingress with per-sandbox egress control |
 | Pause semantics | No pause API | **Deletes the Pod** and rebuilds it on resume from `spec.template` plus a checkpointed pod-template delta. `PauseStrategy: Stop` only — `Hibernate`, `persistentContents`, and GPU-memory checkpointing are declared in the API but [return "not yet supported"](https://github.com/openkruise/agents/blob/master/pkg/controller/sandbox/core/common_control.go) as of August 2026 | Not CRD-driven |
-| External API compatibility | None | **E2B SDK compatible**, plus a [Kubernetes SDK](https://github.com/openkruise/agents-api) | Five first-party language SDKs and an MCP server |
+| External API compatibility | None | **E2B SDK compatible**, plus a [Kubernetes SDK](https://github.com/openkruise/agents-api). Caveat: `/pause` returns 204 like E2B but does not preserve memory, and the E2B endpoint offers no way to ask for it | Five first-party language SDKs and an MCP server |
 | Maturity | v0.x, explicitly not production-ready for all workloads | v0.x, earlier still | Validated at scale inside Alibaba and Tencent |
 
 ## Self-Hosted Sandboxes
