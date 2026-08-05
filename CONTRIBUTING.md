@@ -8,18 +8,34 @@ A project belongs on this list if it helps **run untrusted or AI-generated code 
 
 A project does **not** belong here just because it is agent-related. Agent frameworks, prompt tooling, and MCP servers are out of scope unless they ship a sandbox — and if they do, they go under "Agent Frameworks with Built-in Sandboxes", clearly marked.
 
-## Every entry needs
+## Entry format
 
-1. **An isolation model** — one of the three tiers in the README: *shared kernel*, *intercepted kernel*, or *separate kernel*. Add `+ TEE` for hardware confidential computing, say `WebAssembly` where there is no kernel, or say `any` if the project delegates to a RuntimeClass. If you cannot determine it from documentation or source, say so in the pull request rather than guessing.
-2. **A named backer** — a company, a foundation, or "Community". "Unknown" is acceptable; blank is not.
-3. **A one-line reason it is on the list.** What does it do that its neighbours in the table do not? Marketing copy gets rewritten.
-4. **A live star badge**, if it has a public repository:
+One line, always this shape:
+
+```markdown
+- [Name](url) - One sentence, under 20 words. `backer` `isolation` `how you run it` ![Stars](badge)
+```
+
+Real example:
+
+```markdown
+- [agent-sandbox](https://github.com/kubernetes-sigs/agent-sandbox) - The emerging standard: four CRDs, warm pools, stable identity. `Google + Red Hat` `any runtime` `v0.x` ![Stars](https://img.shields.io/github/stars/kubernetes-sigs/agent-sandbox?style=flat-square&label=%20)
+```
+
+The tags are the comparison. Keep them to two or three, lowercase, and reuse the vocabulary already in the file rather than inventing a synonym — a reader should be able to scan one column of tags and see the difference between two projects without reading either sentence.
+
+1. **The sentence** says what this does that its neighbours do not. One claim, not a summary. Marketing copy gets rewritten.
+2. **The isolation tag** is one of the three tiers in the README — `shared kernel`, `intercepted kernel`, or `separate kernel`. Use `any runtime` when the project delegates to a RuntimeClass, add `+ TEE` for hardware confidential computing. If you cannot determine it from documentation or source, say so in the pull request rather than guessing.
+3. **The backer tag** is a company, a foundation, or `Community`. `Unknown` is acceptable; blank is not.
+4. **The star badge** is required for anything with a public repository:
 
    ```markdown
    ![Stars](https://img.shields.io/github/stars/OWNER/REPO?style=flat-square&label=%20)
    ```
 
-   Never hardcode a star count. They go stale within days.
+   Never hardcode a star count. They go stale within days. Entries with no repository end the last tag with a period instead.
+
+Anything longer than one line belongs in [COMPARISON.md](COMPARISON.md), where the tables have room for it.
 
 ## Quality bar
 
