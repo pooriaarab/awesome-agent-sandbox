@@ -17,41 +17,35 @@ Everything here isolates in one of three ways, and that choice matters more than
 
 ## Isolation Runtimes
 
-Three ways to isolate, weakest to strongest. Every product further down this list picks one of these, so the vocabulary here is used throughout.
+Three ways to isolate, weakest to strongest. Everything else in this list picks one, so these names are used throughout.
 
-The rule of thumb: **your own agent on your own laptop needs a shared kernel at most. A stranger's generated code needs a separate kernel.** Everything in between is a business decision, not a technical one.
+**Your own code needs a shared kernel at most. A stranger's needs a separate one.** The middle is a business decision, not a technical one.
 
 ### Shared kernel
 
-The sandbox and the host run the same kernel, fenced off with namespaces, cgroups, and syscall filters. Cheap and instant. A kernel vulnerability is a full host compromise, so this is for code you mostly trust.
+Same kernel as the host, fenced off with namespaces, cgroups, and syscall filters. Instant and cheap, but a kernel bug is a host compromise.
 
-- [runc](https://github.com/opencontainers/runc) - The default container runtime, and the baseline this list measures against. Backed by the OCI. ![Stars](https://img.shields.io/github/stars/opencontainers/runc?style=flat-square&label=%20)
-- [Sysbox](https://github.com/nestybox/sysbox) - Hardened runc. Runs Docker-in-Docker and systemd safely without a virtual machine, which is the strongest you can get while still sharing a kernel. Backed by Docker. ![Stars](https://img.shields.io/github/stars/nestybox/sysbox?style=flat-square&label=%20)
-- [youki](https://github.com/youki-dev/youki) - OCI container runtime written in Rust. ![Stars](https://img.shields.io/github/stars/youki-dev/youki?style=flat-square&label=%20)
-- [bubblewrap](https://github.com/containers/bubblewrap) - Unprivileged process sandboxing, the engine underneath Flatpak. Backed by Red Hat. ![Stars](https://img.shields.io/github/stars/containers/bubblewrap?style=flat-square&label=%20)
+- [runc](https://github.com/opencontainers/runc) - The default, and the baseline this list measures against. Backed by the OCI. ![Stars](https://img.shields.io/github/stars/opencontainers/runc?style=flat-square&label=%20)
+- [Sysbox](https://github.com/nestybox/sysbox) - Hardened runc that runs Docker-in-Docker and systemd safely. The strongest option that still shares a kernel. Backed by Docker. ![Stars](https://img.shields.io/github/stars/nestybox/sysbox?style=flat-square&label=%20)
+- [bubblewrap](https://github.com/containers/bubblewrap) - Unprivileged process sandboxing, the engine under Flatpak. Backed by Red Hat. ![Stars](https://img.shields.io/github/stars/containers/bubblewrap?style=flat-square&label=%20)
 - [nsjail](https://github.com/google/nsjail) - Namespaces, cgroups, rlimits, and seccomp-bpf in one small tool. Backed by Google. ![Stars](https://img.shields.io/github/stars/google/nsjail?style=flat-square&label=%20)
 
 ### Intercepted kernel
 
-Syscalls are caught and reimplemented in user space before they ever reach the host kernel. The host's attack surface shrinks dramatically without needing virtualization, which is why this wins on managed Kubernetes where nested virtualization is often unavailable.
+Syscalls are reimplemented in user space and never reach the host kernel. No virtualization required, which is why it wins on managed Kubernetes.
 
-- [gVisor](https://github.com/google/gvisor) - The only production option in this category, and the default on Google Kubernetes Engine. Backed by Google. ![Stars](https://img.shields.io/github/stars/google/gvisor?style=flat-square&label=%20)
+- [gVisor](https://github.com/google/gvisor) - The only production option here, and the default on Google Kubernetes Engine. Backed by Google. ![Stars](https://img.shields.io/github/stars/google/gvisor?style=flat-square&label=%20)
 
 ### Separate kernel
 
-The sandbox boots its own Linux kernel inside a virtual machine. Nothing is shared, so a kernel exploit stays in the box. This is the baseline for running code you did not write.
+Its own Linux kernel in a virtual machine. Nothing shared, so an exploit stays in the box. The baseline for code you did not write.
 
 - [Firecracker](https://github.com/firecracker-microvm/firecracker) - The microVM that created this category, booting in roughly 125ms. Backed by AWS. ![Stars](https://img.shields.io/github/stars/firecracker-microvm/firecracker?style=flat-square&label=%20)
-- [Kata Containers](https://github.com/kata-containers/kata-containers) - The most mature Kubernetes integration of the microVM runtimes, with swappable VMM backends. Pair it with Intel TDX or AMD SEV-SNP when the host operator is also part of your threat model. Backed by the OpenInfra Foundation. ![Stars](https://img.shields.io/github/stars/kata-containers/kata-containers?style=flat-square&label=%20)
-- [Cloud Hypervisor](https://github.com/cloud-hypervisor/cloud-hypervisor) - Modern Rust VMM, frequently used as a Kata backend. Backed by the Linux Foundation. ![Stars](https://img.shields.io/github/stars/cloud-hypervisor/cloud-hypervisor?style=flat-square&label=%20)
-- [Edera Protect](https://edera.dev/) - Container-native Type-1 hypervisor giving each pod its own kernel without requiring hardware virtualization extensions, which unlocks instance types Kata cannot use. Core is closed source; the [agent-sandbox integration](https://github.com/edera-dev/edera-agent) is public. ![Stars](https://img.shields.io/github/stars/edera-dev/edera-agent?style=flat-square&label=%20)
+- [Kata Containers](https://github.com/kata-containers/kata-containers) - The most mature Kubernetes integration, with swappable VMM backends. Add Intel TDX or AMD SEV-SNP when the host operator is also in your threat model. Backed by the OpenInfra Foundation. ![Stars](https://img.shields.io/github/stars/kata-containers/kata-containers?style=flat-square&label=%20)
+- [Cloud Hypervisor](https://github.com/cloud-hypervisor/cloud-hypervisor) - Modern Rust VMM, commonly used as a Kata backend. Backed by the Linux Foundation. ![Stars](https://img.shields.io/github/stars/cloud-hypervisor/cloud-hypervisor?style=flat-square&label=%20)
+- [Edera Protect](https://edera.dev/) - Type-1 hypervisor giving each pod its own kernel with no hardware virtualization required, unlocking instance types Kata cannot use. Core is closed; the [agent-sandbox integration](https://github.com/edera-dev/edera-agent) is public. ![Stars](https://img.shields.io/github/stars/edera-dev/edera-agent?style=flat-square&label=%20)
 
-### WebAssembly
-
-A different axis rather than a fourth tier. There is no kernel to escape, but the sandbox cannot run arbitrary Linux binaries either, so this only fits when you control the language runtime.
-
-- [runwasi](https://github.com/containerd/runwasi) - Runs WebAssembly and WASI workloads under containerd. Backed by CNCF. ![Stars](https://img.shields.io/github/stars/containerd/runwasi?style=flat-square&label=%20)
-- [WasmEdge](https://github.com/WasmEdge/WasmEdge) - WebAssembly runtime for cloud-native and edge workloads. Backed by CNCF. ![Stars](https://img.shields.io/github/stars/WasmEdge/WasmEdge?style=flat-square&label=%20)
+WebAssembly is a fourth option on a different axis: no kernel to escape, but no arbitrary Linux binaries either. See [runwasi](https://github.com/containerd/runwasi) and [WasmEdge](https://github.com/WasmEdge/WasmEdge).
 
 ## Kubernetes-Native Sandbox Orchestrators
 

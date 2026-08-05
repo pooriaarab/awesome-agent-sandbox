@@ -17,7 +17,6 @@ Four dimensions per table: stars (live), who backs it, how it runs on Kubernetes
 | [Sysbox](https://github.com/nestybox/sysbox) | ![](https://img.shields.io/github/stars/nestybox/sysbox?style=flat-square&label=%20) | Docker | RuntimeClass | Shared kernel, hardened |
 | [Edera Protect](https://edera.dev/) | — core closed | Edera | RuntimeClass | Separate kernel, no hardware virtualization needed |
 | [runc](https://github.com/opencontainers/runc) | ![](https://img.shields.io/github/stars/opencontainers/runc?style=flat-square&label=%20) | OCI | RuntimeClass, default | Shared kernel |
-| [youki](https://github.com/youki-dev/youki) | ![](https://img.shields.io/github/stars/youki-dev/youki?style=flat-square&label=%20) | Community | RuntimeClass | Shared kernel |
 | [bubblewrap](https://github.com/containers/bubblewrap) | ![](https://img.shields.io/github/stars/containers/bubblewrap?style=flat-square&label=%20) | Red Hat / Flatpak | Unofficial | Shared kernel |
 | [nsjail](https://github.com/google/nsjail) | ![](https://img.shields.io/github/stars/google/nsjail?style=flat-square&label=%20) | Google | Unofficial | Shared kernel |
 | [runwasi](https://github.com/containerd/runwasi) | ![](https://img.shields.io/github/stars/containerd/runwasi?style=flat-square&label=%20) | CNCF | RuntimeClass | WebAssembly |
