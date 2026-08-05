@@ -10,32 +10,55 @@ A project does **not** belong here just because it is agent-related. Agent frame
 
 ## Entry format
 
-One line, always this shape:
+One line, always this shape — a sentence, then isolation, then how you run it, then who backs it, then stars:
 
 ```markdown
-- [Name](url) - One sentence, under 20 words. `backer` `isolation` `how you run it` ![Stars](badge)
+- [Name](url) - One sentence, under 20 words. ![isolation](badge) ![how you run it](badge) ![backer](badge) ![Stars](badge)
 ```
 
-Real example:
+The badges are the comparison. A reader should be able to scan one column and see the difference between two projects without reading either sentence.
+
+### Badge colours have fixed meanings
+
+**Colour is reserved for isolation strength.** Never use a colour from this table for anything else, and never introduce a new one.
+
+| Isolation | Colour    | Badge text            |
+| --------- | --------- | --------------------- |
+| Weakest   | `d1242f`  | `shared kernel`       |
+| Middle    | `bf8700`  | `intercepted kernel`  |
+| Strongest | `1a7f37`  | `separate kernel`     |
+| Pluggable | `0969da`  | `any runtime`         |
+| Strongest, hides from the host | `8250df` | `separate + TEE` |
+| Not a sandbox at all | `6e7781` | `not a sandbox`, `bundles a sandbox`, `evaluation` |
+
+The other two badges are deliberately neutral greys so they never compete with the isolation signal:
+
+- **How you run it** — `8b949e`. Say *where* it actually runs: `native CRDs`, `Helm`, `your server`, `your laptop`, `no self-host`, `BYOC on enterprise`. Avoid vague words like "local" — a reader cannot tell whether that means "not Kubernetes" or "runs on your laptop".
+- **Who backs it** — `4a5568`. A company, a foundation, or `Community`. `Unknown` is acceptable; blank is not.
+
+Runtimes in the Isolation Runtimes section skip the isolation badge, since the subsection already states the tier. They use a distinguishing fact instead — `125ms boot`, `default on GKE`, `Kata backend`.
+
+### Writing the badge URL
+
+```
+https://img.shields.io/badge/<TEXT>-<COLOUR>?style=flat-square
+```
+
+Escaping catches people out: spaces are `%20`, a literal `+` is `%2B`, and a literal hyphen must be **doubled** (`no self--host` renders as "no self-host"). Open the URL in a browser before opening the pull request.
+
+### Star badges
+
+Required for anything with a public repository:
 
 ```markdown
-- [agent-sandbox](https://github.com/kubernetes-sigs/agent-sandbox) - The emerging standard: four CRDs, warm pools, stable identity. `Google + Red Hat` `any runtime` `v0.x` ![Stars](https://img.shields.io/github/stars/kubernetes-sigs/agent-sandbox?style=flat-square&label=%20)
+![Stars](https://img.shields.io/github/stars/OWNER/REPO?style=flat-square&label=%20)
 ```
 
-The tags are the comparison. Keep them to two or three, lowercase, and reuse the vocabulary already in the file rather than inventing a synonym — a reader should be able to scan one column of tags and see the difference between two projects without reading either sentence.
+Never hardcode a star count — they go stale within days. Entries with no repository end on the backer badge instead.
 
-1. **The sentence** says what this does that its neighbours do not. One claim, not a summary. Marketing copy gets rewritten.
-2. **The isolation tag** is one of the three tiers in the README — `shared kernel`, `intercepted kernel`, or `separate kernel`. Use `any runtime` when the project delegates to a RuntimeClass, add `+ TEE` for hardware confidential computing. If you cannot determine it from documentation or source, say so in the pull request rather than guessing.
-3. **The backer tag** is a company, a foundation, or `Community`. `Unknown` is acceptable; blank is not.
-4. **The star badge** is required for anything with a public repository:
+### The sentence
 
-   ```markdown
-   ![Stars](https://img.shields.io/github/stars/OWNER/REPO?style=flat-square&label=%20)
-   ```
-
-   Never hardcode a star count. They go stale within days. Entries with no repository end the last tag with a period instead.
-
-Anything longer than one line belongs in [COMPARISON.md](COMPARISON.md), where the tables have room for it.
+One claim, not a summary: what does this do that its neighbours do not? Marketing copy gets rewritten. Anything longer belongs in [COMPARISON.md](COMPARISON.md), where the tables have room for it.
 
 ## Quality bar
 
