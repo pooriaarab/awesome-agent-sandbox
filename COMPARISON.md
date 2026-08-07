@@ -88,6 +88,7 @@ Note how uniformly the Kubernetes column reads *None*. That is the defining trad
 | [GKE Agent Sandbox](https://docs.cloud.google.com/kubernetes-engine/docs/how-to/agent-sandbox) | see upstream | Google Cloud | **Yes**, upstream is open | Intercepted kernel by default |
 | [Alibaba Cloud AgentBay](https://www.aliyun.com/product/agentbay) | ![](https://img.shields.io/github/stars/agentbay-ai/wuying-agentbay-sdk?style=flat-square&label=%20) | Alibaba Cloud | Via ACS | Intercepted or separate kernel |
 | [Tencent Cloud AGSX](https://cloud.tencent.com/product/agsx) | see CubeSandbox | Tencent Cloud | Via CubeSandbox | Intercepted or separate kernel |
+| [Volcengine Sandbox](https://www.volcengine.com/product/sandbox) | — | ByteDance (Volcengine) | None | Not documented |
 
 ## A note on reading star counts
 
