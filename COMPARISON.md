@@ -49,7 +49,7 @@ Not competitors. OpenKruise Agents states it maintains compatibility with SIG Ag
 | Strong isolation | Documented use cases and examples for gVisor, Kata, and Firecracker | `spec.template` is a plain `PodTemplateSpec`, so `runtimeClassName` passes through and gVisor or Kata will apply. But `runtimeClassName` appears nowhere in the codebase — no docs, examples, or tests — and [roadmap.md](https://github.com/openkruise/agents/blob/master/roadmap.md) still lists "Kata/gvisor/kuasar best practice" as pending. Pause, checkpoint deltas, and sidecar injection are all written against ordinary containers | README documents gVisor, Kata, and Firecracker support |
 | Maturity | v0.x, explicitly not production-ready for all workloads | v0.x, earlier still | Validated at scale inside Alibaba and Tencent |
 
-## Self-Hosted Sandboxes
+## Standalone Sandboxes
 
 | Project | Stars | Backed by | Kubernetes | Isolation |
 | --- | --- | --- | --- | --- |

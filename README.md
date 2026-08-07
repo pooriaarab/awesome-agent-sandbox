@@ -14,7 +14,7 @@ Star badges are live. Full side-by-side tables are in [COMPARISON.md](COMPARISON
 
 - [Isolation Runtimes](#isolation-runtimes)
 - [On Kubernetes](#on-kubernetes)
-- [Self-Hosted](#self-hosted)
+- [Standalone Sandboxes](#standalone-sandboxes)
 - [Managed Platforms](#managed-platforms)
 - [Related Projects](#related-projects)
 - [Articles](#articles)
@@ -78,9 +78,9 @@ What is genuinely cluster-specific: CRDs.
 - [vCluster](https://github.com/loft-sh/vcluster) - Gives each tenant a virtual control plane with its own API server and CRDs. That isolates the control plane, not the workload — pair it with a real runtime rather than relying on it alone. ![control plane only](https://img.shields.io/badge/control%20plane%20only-6e7781?style=flat-square) ![Loft Labs](https://img.shields.io/badge/Loft%20Labs-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/loft-sh/vcluster?style=flat-square&label=%20)
 - [kagent](https://github.com/kagent-dev/kagent) - Kubernetes-native, but it orchestrates agents rather than isolating them — Agent, ModelConfig, and ToolServer CRDs, with isolation left to something else. Pairs with agent-sandbox rather than competing with it. ![not a sandbox](https://img.shields.io/badge/not%20a%20sandbox-6e7781?style=flat-square) ![pairs with agent-sandbox](https://img.shields.io/badge/pairs%20with%20agent--sandbox-8b949e?style=flat-square) ![Solo.io](https://img.shields.io/badge/Solo.io-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/kagent-dev/kagent?style=flat-square&label=%20)
 
-## Self-Hosted
+## Standalone Sandboxes
 
-Open source, and you can run it yourself — on a server, on a laptop, or on a cluster via Helm.
+Sandboxes you run yourself, with no cluster required — a server, a laptop, or a single container. Several also ship Helm charts if you do have one.
 
 - [E2B](https://github.com/e2b-dev/E2B) - The most widely adopted agent sandbox SDK, on Firecracker with userfaultfd-backed lazy memory restore — which is how a paused sandbox resumes in tens of milliseconds. Self-hosting is Terraform, not Kubernetes. ![separate kernel](https://img.shields.io/badge/separate%20kernel-1a7f37?style=flat-square) ![Terraform, not K8s](https://img.shields.io/badge/Terraform,%20not%20K8s-8b949e?style=flat-square) ![E2B](https://img.shields.io/badge/E2B-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/e2b-dev/E2B?style=flat-square&label=%20)
 - [Daytona](https://github.com/daytonaio/daytona) - Fastest cold starts in the category, from pre-warmed Docker snapshots. Default isolation is a plain container, with Sysbox or Kata swappable in. The star count predates the pivot from dev environments. ![shared kernel](https://img.shields.io/badge/shared%20kernel-d1242f?style=flat-square) ![Helm](https://img.shields.io/badge/Helm-8b949e?style=flat-square) ![Daytona](https://img.shields.io/badge/Daytona-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/daytonaio/daytona?style=flat-square&label=%20)
