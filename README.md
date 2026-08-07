@@ -21,7 +21,7 @@ Star badges are live. Full side-by-side tables are in [COMPARISON.md](COMPARISON
 
 ## Isolation Runtimes
 
-The layer that actually provides the boundary. Everything else in this list picks one of these, so the three tier names are used throughout.
+The layer that actually provides the boundary — the well-known ones, independent of any orchestrator. Everything else in this list picks one, so these tier names are used throughout.
 
 **Your own code needs a shared kernel at most. A stranger's needs a separate one.** The middle is a business decision, not a technical one.
 
@@ -36,31 +36,40 @@ The layer that actually provides the boundary. Everything else in this list pick
 
 ### Intercepted kernel
 
-> Syscalls are reimplemented in user space and never reach the host kernel. No virtualization required, which is why it wins on managed Kubernetes.
+> Syscalls are reimplemented in user space and never reach the host kernel. Strong isolation without needing hardware virtualization.
 
-- [gVisor](https://github.com/google/gvisor) - The only production option in this tier. Its Sentry reimplements most of the Linux syscall surface in user space, so the host sees a fraction of the calls — and no virtualization is required. ![default on GKE](https://img.shields.io/badge/default%20on%20GKE-8b949e?style=flat-square) ![Google](https://img.shields.io/badge/Google-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/google/gvisor?style=flat-square&label=%20)
+- [gVisor](https://github.com/google/gvisor) - The only production option in this tier. Its Sentry reimplements most of the Linux syscall surface in user space, so the host sees a fraction of the calls — and no virtualization is required. ![no virtualization needed](https://img.shields.io/badge/no%20virtualization%20needed-8b949e?style=flat-square) ![Google](https://img.shields.io/badge/Google-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/google/gvisor?style=flat-square&label=%20)
 
 ### Separate kernel
 
 > Its own Linux kernel in a virtual machine. Nothing shared, so an exploit stays in the box. The baseline for code you did not write.
 
-- [Firecracker](https://github.com/firecracker-microvm/firecracker) - The microVM that created this category and still the leanest: a minimal device model, a few MB of overhead per VM, and the snapshot support that E2B and others build pause/resume on. Reaches Kubernetes as a Kata backend. ![125ms boot](https://img.shields.io/badge/125ms%20boot-8b949e?style=flat-square) ![AWS](https://img.shields.io/badge/AWS-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/firecracker-microvm/firecracker?style=flat-square&label=%20)
-- [Kata Containers](https://github.com/kata-containers/kata-containers) - Swappable VMM backends — QEMU, Firecracker, Cloud Hypervisor, Dragonball — behind a standard RuntimeClass, plus Intel TDX or AMD SEV-SNP when the host operator is in your threat model. ![most mature on K8s](https://img.shields.io/badge/most%20mature%20on%20K8s-8b949e?style=flat-square) ![OpenInfra](https://img.shields.io/badge/OpenInfra-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/kata-containers/kata-containers?style=flat-square&label=%20)
+- [Firecracker](https://github.com/firecracker-microvm/firecracker) - The microVM that created this category and still the leanest: a minimal device model, a few MB of overhead per VM, and the snapshot support that E2B and others build pause/resume on. ![125ms boot](https://img.shields.io/badge/125ms%20boot-8b949e?style=flat-square) ![AWS](https://img.shields.io/badge/AWS-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/firecracker-microvm/firecracker?style=flat-square&label=%20)
+- [Kata Containers](https://github.com/kata-containers/kata-containers) - Swappable VMM backends — QEMU, Firecracker, Cloud Hypervisor, Dragonball — behind one OCI-compatible runtime, plus Intel TDX or AMD SEV-SNP when the host operator is in your threat model. ![swappable VMMs](https://img.shields.io/badge/swappable%20VMMs-8b949e?style=flat-square) ![OpenInfra](https://img.shields.io/badge/OpenInfra-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/kata-containers/kata-containers?style=flat-square&label=%20)
 - [Cloud Hypervisor](https://github.com/cloud-hypervisor/cloud-hypervisor) - Modern Rust VMM built for cloud workloads and commonly used as a Kata backend. Supports CPU and memory hotplug, which matters if you want to resize a sandbox rather than recreate it. ![Kata backend](https://img.shields.io/badge/Kata%20backend-8b949e?style=flat-square) ![Linux Foundation](https://img.shields.io/badge/Linux%20Foundation-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/cloud-hypervisor/cloud-hypervisor?style=flat-square&label=%20)
-- [KubeVirt](https://github.com/kubevirt/kubevirt) - Full virtual machines as CRDs rather than a RuntimeClass, with live migration and device passthrough. Heavy for a code sandbox, but the answer when the workload needs a desktop, a GPU, or Windows. ![separate kernel](https://img.shields.io/badge/separate%20kernel-1a7f37?style=flat-square) ![native CRDs, heavy](https://img.shields.io/badge/native%20CRDs,%20heavy-8b949e?style=flat-square) ![Red Hat](https://img.shields.io/badge/Red%20Hat-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/kubevirt/kubevirt?style=flat-square&label=%20)
-- [Confidential Containers](https://github.com/confidential-containers/operator) - An operator that pairs Kata with a hardware TEE, so sandbox memory is opaque to the host as well. For regulated workloads where the cloud provider sits outside the trust boundary. ![separate + TEE](https://img.shields.io/badge/separate%20%2B%20TEE-8250df?style=flat-square) ![native CRDs](https://img.shields.io/badge/native%20CRDs-8b949e?style=flat-square) ![Intel, IBM, Red Hat](https://img.shields.io/badge/Intel,%20IBM,%20Red%20Hat-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/confidential-containers/operator?style=flat-square&label=%20)
 
 WebAssembly is a fourth option on a different axis: no kernel to escape, but no arbitrary Linux binaries either. See [runwasi](https://github.com/containerd/runwasi) and [WasmEdge](https://github.com/WasmEdge/WasmEdge).
 
 ## On Kubernetes
 
-Projects that make a sandbox a first-class cluster resource. They do not isolate anything themselves — they pick a runtime from above and manage lifecycle, identity, and storage around it.
+What is genuinely cluster-specific: CRDs.
+
+### Sandbox CRDs
+
+> Make a sandbox a first-class resource — identity, storage, warm pools, pause and resume. Isolation is delegated to a runtime above.
 
 - [agent-sandbox](https://github.com/kubernetes-sigs/agent-sandbox) - The emerging standard, under SIG Apps. Four CRDs give a sandbox stable identity, persistent storage, and a warm pool, while isolation is delegated to whichever RuntimeClass you point it at. ![any runtime](https://img.shields.io/badge/any%20runtime-0969da?style=flat-square) ![native CRDs, v0.x](https://img.shields.io/badge/native%20CRDs,%20v0.x-8b949e?style=flat-square) ![Google, Red Hat](https://img.shields.io/badge/Google,%20Red%20Hat-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/kubernetes-sigs/agent-sandbox?style=flat-square&label=%20)
 - [OpenSandbox](https://github.com/opensandbox-group/OpenSandbox) - A complete platform rather than a bare API: five language SDKs, an MCP server, a credential vault, and per-sandbox egress control, over either Docker or Kubernetes runtimes. ![any runtime](https://img.shields.io/badge/any%20runtime-0969da?style=flat-square) ![native CRDs](https://img.shields.io/badge/native%20CRDs-8b949e?style=flat-square) ![Alibaba](https://img.shields.io/badge/Alibaba-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/opensandbox-group/OpenSandbox?style=flat-square&label=%20)
 - [CubeSandbox](https://github.com/TencentCloud/CubeSandbox) - Tencent's internal stack, open-sourced in 2026 after large-scale production use. A one-click script deploys it without a cluster at all, which makes it unusually cheap to evaluate. ![separate kernel](https://img.shields.io/badge/separate%20kernel-1a7f37?style=flat-square) ![native CRDs or none](https://img.shields.io/badge/native%20CRDs%20or%20none-8b949e?style=flat-square) ![Tencent Cloud](https://img.shields.io/badge/Tencent%20Cloud-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/TencentCloud/CubeSandbox?style=flat-square&label=%20)
 - [OpenKruise Agents](https://github.com/openkruise/agents) - Ten CRDs extending the SIG API, plus an E2B-compatible server so existing E2B clients can target your own cluster. Note that pause deletes the Pod — in-memory state does not survive it. ![any runtime, unproven](https://img.shields.io/badge/any%20runtime,%20unproven-0969da?style=flat-square) ![10 CRDs](https://img.shields.io/badge/10%20CRDs-8b949e?style=flat-square) ![Alibaba Cloud](https://img.shields.io/badge/Alibaba%20Cloud-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/openkruise/agents?style=flat-square&label=%20)
 - [mitos](https://github.com/mitos-run/mitos) - Restores Firecracker VMs from memory snapshots in milliseconds and forks them on Kubernetes, aimed at fan-out workloads where every branch starts from the same warm state. ![separate kernel](https://img.shields.io/badge/separate%20kernel-1a7f37?style=flat-square) ![native CRDs](https://img.shields.io/badge/native%20CRDs-8b949e?style=flat-square) ![mitos-run](https://img.shields.io/badge/mitos--run-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/mitos-run/mitos?style=flat-square&label=%20)
+
+### Cluster-native isolation
+
+> The separate-kernel option packaged as CRDs instead of a runtime binary.
+
+- [KubeVirt](https://github.com/kubevirt/kubevirt) - Full virtual machines as CRDs rather than a RuntimeClass, with live migration and device passthrough. Heavy for a code sandbox, but the answer when the workload needs a desktop, a GPU, or Windows. ![separate kernel](https://img.shields.io/badge/separate%20kernel-1a7f37?style=flat-square) ![native CRDs, heavy](https://img.shields.io/badge/native%20CRDs,%20heavy-8b949e?style=flat-square) ![Red Hat](https://img.shields.io/badge/Red%20Hat-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/kubevirt/kubevirt?style=flat-square&label=%20)
+- [Confidential Containers](https://github.com/confidential-containers/operator) - An operator that pairs Kata with a hardware TEE, so sandbox memory is opaque to the host as well. For regulated workloads where the cloud provider sits outside the trust boundary. ![separate + TEE](https://img.shields.io/badge/separate%20%2B%20TEE-8250df?style=flat-square) ![native CRDs](https://img.shields.io/badge/native%20CRDs-8b949e?style=flat-square) ![Intel, IBM, Red Hat](https://img.shields.io/badge/Intel,%20IBM,%20Red%20Hat-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/confidential-containers/operator?style=flat-square&label=%20)
 
 ### Adjacent layers
 
