@@ -31,7 +31,6 @@ Four dimensions per table: stars (live), who backs it, how it runs on Kubernetes
 | [OpenSandbox](https://github.com/opensandbox-group/OpenSandbox) | ![](https://img.shields.io/github/stars/opensandbox-group/OpenSandbox?style=flat-square&label=%20) | Alibaba | Native CRDs | Any |
 | [CubeSandbox](https://github.com/TencentCloud/CubeSandbox) | ![](https://img.shields.io/github/stars/TencentCloud/CubeSandbox?style=flat-square&label=%20) | Tencent Cloud | Native CRDs, or no cluster at all | Intercepted or separate kernel |
 | [OpenKruise Agents](https://github.com/openkruise/agents) | ![](https://img.shields.io/github/stars/openkruise/agents?style=flat-square&label=%20) | Alibaba Cloud (CNCF OpenKruise) | Native CRDs | Any, but unproven — see below |
-| [vCluster](https://github.com/loft-sh/vcluster) | ![](https://img.shields.io/github/stars/loft-sh/vcluster?style=flat-square&label=%20) | Loft Labs | Native CRDs | Control plane only — stack it with a real runtime |
 | [mitos](https://github.com/mitos-run/mitos) | ![](https://img.shields.io/github/stars/mitos-run/mitos?style=flat-square&label=%20) | mitos-run | Native CRDs | Separate kernel |
 
 ### The three CRD approaches, in detail
