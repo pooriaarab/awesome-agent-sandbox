@@ -8,7 +8,7 @@ Every entry is one sentence followed by three badges: **how it isolates**, **how
 
 ![shared kernel](https://img.shields.io/badge/shared%20kernel-d1242f?style=flat-square) weakest, shares the host kernel  ·  ![intercepted kernel](https://img.shields.io/badge/intercepted%20kernel-bf8700?style=flat-square) syscalls served in user space  ·  ![separate kernel](https://img.shields.io/badge/separate%20kernel-1a7f37?style=flat-square) strongest, own kernel in a VM  ·  ![any runtime](https://img.shields.io/badge/any%20runtime-0969da?style=flat-square) you choose  ·  ![separate + TEE](https://img.shields.io/badge/separate%20%2B%20TEE-8250df?style=flat-square) hides from the host too
 
-Star badges are live. Full side-by-side tables are in [COMPARISON.md](COMPARISON.md).
+Star badges are live. Full side-by-side tables are in [COMPARISON.md](COMPARISON.md), including an [On Kubernetes](COMPARISON.md#on-kubernetes) view of which layer each project occupies.
 
 ## Contents
 

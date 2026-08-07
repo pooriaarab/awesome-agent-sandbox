@@ -6,6 +6,21 @@ Four dimensions per table: stars (live), who backs it, how it runs on Kubernetes
 
 **Kubernetes** is stated plainly: *Native CRDs* (sandboxes are first-class resources), *Helm* (official manifests, no CRDs), *RuntimeClass* (it is a runtime, it plugs in), *Unofficial* (works, but not the documented path), or *None* (no self-hosting at all).
 
+## On Kubernetes
+
+Everything in this list that installs into a cluster, and which layer it occupies. These **stack rather than compete**: an agent orchestrator decides what runs, a sandbox orchestrator decides what it runs inside, and a runtime provides the boundary. Picking one does not rule out the others.
+
+| Layer | Projects | Plugs in as | Isolation |
+| --- | --- | --- | --- |
+| Agent orchestration | [kagent](https://github.com/kagent-dev/kagent) | CRDs | None — pair it with a sandbox |
+| Sandbox orchestration | [agent-sandbox](https://github.com/kubernetes-sigs/agent-sandbox), [OpenSandbox](https://github.com/opensandbox-group/OpenSandbox), [CubeSandbox](https://github.com/TencentCloud/CubeSandbox), [OpenKruise Agents](https://github.com/openkruise/agents), [mitos](https://github.com/mitos-run/mitos) | CRDs | Delegated to the runtime below |
+| Control plane | [vCluster](https://github.com/loft-sh/vcluster) | CRDs | None — isolates the API server, not the workload |
+| Runtime | [gVisor](https://github.com/google/gvisor), [Kata](https://github.com/kata-containers/kata-containers), [Cloud Hypervisor](https://github.com/cloud-hypervisor/cloud-hypervisor), [Sysbox](https://github.com/nestybox/sysbox), [runc](https://github.com/opencontainers/runc) | `RuntimeClass` | Shared → intercepted → separate kernel |
+| Runtime | [KubeVirt](https://github.com/kubevirt/kubevirt), [Confidential Containers](https://github.com/confidential-containers/operator) | CRDs | Separate kernel, `+ TEE` |
+| Managed, on your cluster | [GKE Agent Sandbox](https://docs.cloud.google.com/kubernetes-engine/docs/how-to/agent-sandbox), [Northflank](https://northflank.com/) | Vendor install | Intercepted / separate kernel |
+
+A runtime that ships CRDs is still a runtime — the packaging differs, the layer does not. That is why KubeVirt sits with Kata rather than with agent-sandbox.
+
 ## Isolation Runtimes
 
 | Runtime | Stars | Backed by | Kubernetes | Isolation |
