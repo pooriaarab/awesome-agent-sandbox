@@ -40,13 +40,14 @@ The layer that actually provides the boundary — the well-known ones, independe
 
 - [gVisor](https://github.com/google/gvisor) - The only production option in this tier. Its Sentry reimplements most of the Linux syscall surface in user space, so the host sees a fraction of the calls — and no virtualization is required. ![no virtualization needed](https://img.shields.io/badge/no%20virtualization%20needed-8b949e?style=flat-square) ![Google](https://img.shields.io/badge/Google-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/google/gvisor?style=flat-square&label=%20)
 
-### Separate kernel
+### Separate kernel (microVM)
 
-> Its own Linux kernel in a virtual machine. Nothing shared, so an exploit stays in the box. The baseline for code you did not write.
+> A microVM: its own Linux kernel in a stripped-down virtual machine that boots in tens of milliseconds rather than seconds. Nothing is shared, so an exploit stays inside — the baseline for code you did not write.
 
 - [Firecracker](https://github.com/firecracker-microvm/firecracker) - The microVM that created this category and still the leanest: a minimal device model, a few MB of overhead per VM, and the snapshot support that E2B and others build pause/resume on. ![125ms boot](https://img.shields.io/badge/125ms%20boot-8b949e?style=flat-square) ![AWS](https://img.shields.io/badge/AWS-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/firecracker-microvm/firecracker?style=flat-square&label=%20)
 - [Kata Containers](https://github.com/kata-containers/kata-containers) - Swappable VMM backends — QEMU, Firecracker, Cloud Hypervisor, Dragonball — behind one OCI-compatible runtime, plus Intel TDX or AMD SEV-SNP when the host operator is in your threat model. ![swappable VMMs](https://img.shields.io/badge/swappable%20VMMs-8b949e?style=flat-square) ![OpenInfra](https://img.shields.io/badge/OpenInfra-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/kata-containers/kata-containers?style=flat-square&label=%20)
 - [Cloud Hypervisor](https://github.com/cloud-hypervisor/cloud-hypervisor) - Modern Rust VMM built for cloud workloads and commonly used as a Kata backend. Supports CPU and memory hotplug, which matters if you want to resize a sandbox rather than recreate it. ![Kata backend](https://img.shields.io/badge/Kata%20backend-8b949e?style=flat-square) ![Linux Foundation](https://img.shields.io/badge/Linux%20Foundation-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/cloud-hypervisor/cloud-hypervisor?style=flat-square&label=%20)
+- [libkrun](https://github.com/libkrun/libkrun) - A library rather than a daemon: it turns a process into a microVM in place, which is how microsandbox and Lima give a laptop VM-grade isolation without running a hypervisor service. ![library, not a daemon](https://img.shields.io/badge/library,%20not%20a%20daemon-8b949e?style=flat-square) ![Community](https://img.shields.io/badge/Community-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/libkrun/libkrun?style=flat-square&label=%20)
 
 WebAssembly is a fourth option on a different axis: no kernel to escape, but no arbitrary Linux binaries either. See [runwasi](https://github.com/containerd/runwasi) and [WasmEdge](https://github.com/WasmEdge/WasmEdge).
 
