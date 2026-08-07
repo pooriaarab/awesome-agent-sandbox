@@ -40,7 +40,7 @@ The layer that actually provides the boundary — the well-known ones, independe
 
 - [gVisor](https://github.com/google/gvisor) - The only production option in this tier. Its Sentry reimplements most of the Linux syscall surface in user space, so the host sees a fraction of the calls — and no virtualization is required. ![no virtualization needed](https://img.shields.io/badge/no%20virtualization%20needed-8b949e?style=flat-square) ![Google](https://img.shields.io/badge/Google-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/google/gvisor?style=flat-square&label=%20)
 
-### Separate kernel (microVM)
+### Separate kernel
 
 > A microVM: its own Linux kernel in a stripped-down virtual machine that boots in tens of milliseconds rather than seconds. Nothing is shared, so an exploit stays inside — the baseline for code you did not write.
 
