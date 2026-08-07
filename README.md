@@ -12,34 +12,49 @@ Star badges are live. Full side-by-side tables are in [COMPARISON.md](COMPARISON
 
 ## Contents
 
-- [Isolation Tiers](#isolation-tiers)
+- [Isolation Runtimes](#isolation-runtimes)
 - [On Kubernetes](#on-kubernetes)
 - [Self-Hosted](#self-hosted)
 - [Managed Platforms](#managed-platforms)
 - [Related Projects](#related-projects)
 - [Articles](#articles)
 
-## Isolation Tiers
+## Isolation Runtimes
 
-Three ways to isolate, weakest to strongest. Everything below picks one, so these names are used throughout.
-
-| Tier                   | How                                  | Overhead             | Run what               |
-| ---------------------- | ------------------------------------ | -------------------- | ---------------------- |
-| **Shared kernel**      | Namespaces, cgroups, syscall filters | None                 | Code you trust         |
-| **Intercepted kernel** | Syscalls served in user space        | Moderate             | Code you mostly trust  |
-| **Separate kernel**    | Own kernel in a virtual machine      | Boot time and memory | Code you did not write |
+The layer that actually provides the boundary. Everything else in this list picks one of these, so the three tier names are used throughout.
 
 **Your own code needs a shared kernel at most. A stranger's needs a separate one.** The middle is a business decision, not a technical one.
+
+### Shared kernel
+
+> Same kernel as the host, fenced off with namespaces, cgroups, and syscall filters. Instant and cheap, but a kernel bug is a host compromise.
+
+- [runc](https://github.com/opencontainers/runc) - The default container runtime, and the baseline this list measures against. Fine for code you wrote; a kernel bug is a host compromise. ![the default](https://img.shields.io/badge/the%20default-8b949e?style=flat-square) ![OCI](https://img.shields.io/badge/OCI-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/opencontainers/runc?style=flat-square&label=%20)
+- [Sysbox](https://github.com/nestybox/sysbox) - Hardened runc that gives each container its own user namespace and a virtualised `/proc`. Runs Docker-in-Docker and systemd safely — the strongest option that still shares a kernel. ![Docker-in-Docker safe](https://img.shields.io/badge/Docker--in--Docker%20safe-8b949e?style=flat-square) ![Docker](https://img.shields.io/badge/Docker-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/nestybox/sysbox?style=flat-square&label=%20)
+- [bubblewrap](https://github.com/containers/bubblewrap) - Unprivileged process sandboxing on namespaces and seccomp. A building block rather than a platform: both Flatpak and Anthropic's sandbox-runtime sit on top of it. ![engine under Flatpak](https://img.shields.io/badge/engine%20under%20Flatpak-8b949e?style=flat-square) ![Red Hat](https://img.shields.io/badge/Red%20Hat-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/containers/bubblewrap?style=flat-square&label=%20)
+- [nsjail](https://github.com/google/nsjail) - Namespaces, cgroups, rlimits, and seccomp-bpf behind one small binary. Common for CTF judges and untrusted build steps, where a full container runtime is overkill. ![single binary](https://img.shields.io/badge/single%20binary-8b949e?style=flat-square) ![Google](https://img.shields.io/badge/Google-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/google/nsjail?style=flat-square&label=%20)
+
+### Intercepted kernel
+
+> Syscalls are reimplemented in user space and never reach the host kernel. No virtualization required, which is why it wins on managed Kubernetes.
+
+- [gVisor](https://github.com/google/gvisor) - The only production option in this tier. Its Sentry reimplements most of the Linux syscall surface in user space, so the host sees a fraction of the calls — and no virtualization is required. ![default on GKE](https://img.shields.io/badge/default%20on%20GKE-8b949e?style=flat-square) ![Google](https://img.shields.io/badge/Google-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/google/gvisor?style=flat-square&label=%20)
+
+### Separate kernel
+
+> Its own Linux kernel in a virtual machine. Nothing shared, so an exploit stays in the box. The baseline for code you did not write.
+
+- [Firecracker](https://github.com/firecracker-microvm/firecracker) - The microVM that created this category and still the leanest: a minimal device model, a few MB of overhead per VM, and the snapshot support that E2B and others build pause/resume on. Reaches Kubernetes as a Kata backend. ![125ms boot](https://img.shields.io/badge/125ms%20boot-8b949e?style=flat-square) ![AWS](https://img.shields.io/badge/AWS-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/firecracker-microvm/firecracker?style=flat-square&label=%20)
+- [Kata Containers](https://github.com/kata-containers/kata-containers) - Swappable VMM backends — QEMU, Firecracker, Cloud Hypervisor, Dragonball — behind a standard RuntimeClass, plus Intel TDX or AMD SEV-SNP when the host operator is in your threat model. ![most mature on K8s](https://img.shields.io/badge/most%20mature%20on%20K8s-8b949e?style=flat-square) ![OpenInfra](https://img.shields.io/badge/OpenInfra-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/kata-containers/kata-containers?style=flat-square&label=%20)
+- [Cloud Hypervisor](https://github.com/cloud-hypervisor/cloud-hypervisor) - Modern Rust VMM built for cloud workloads and commonly used as a Kata backend. Supports CPU and memory hotplug, which matters if you want to resize a sandbox rather than recreate it. ![Kata backend](https://img.shields.io/badge/Kata%20backend-8b949e?style=flat-square) ![Linux Foundation](https://img.shields.io/badge/Linux%20Foundation-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/cloud-hypervisor/cloud-hypervisor?style=flat-square&label=%20)
+- [KubeVirt](https://github.com/kubevirt/kubevirt) - Full virtual machines as CRDs rather than a RuntimeClass, with live migration and device passthrough. Heavy for a code sandbox, but the answer when the workload needs a desktop, a GPU, or Windows. ![separate kernel](https://img.shields.io/badge/separate%20kernel-1a7f37?style=flat-square) ![native CRDs, heavy](https://img.shields.io/badge/native%20CRDs,%20heavy-8b949e?style=flat-square) ![Red Hat](https://img.shields.io/badge/Red%20Hat-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/kubevirt/kubevirt?style=flat-square&label=%20)
+- [Confidential Containers](https://github.com/confidential-containers/operator) - An operator that pairs Kata with a hardware TEE, so sandbox memory is opaque to the host as well. For regulated workloads where the cloud provider sits outside the trust boundary. ![separate + TEE](https://img.shields.io/badge/separate%20%2B%20TEE-8250df?style=flat-square) ![native CRDs](https://img.shields.io/badge/native%20CRDs-8b949e?style=flat-square) ![Intel, IBM, Red Hat](https://img.shields.io/badge/Intel,%20IBM,%20Red%20Hat-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/confidential-containers/operator?style=flat-square&label=%20)
 
 WebAssembly is a fourth option on a different axis: no kernel to escape, but no arbitrary Linux binaries either. See [runwasi](https://github.com/containerd/runwasi) and [WasmEdge](https://github.com/WasmEdge/WasmEdge).
 
 ## On Kubernetes
 
-Projects that integrate natively with a cluster, through CRDs or a `RuntimeClass`. They **stack rather than compete**: an agent orchestrator decides what runs, a sandbox orchestrator decides what it runs inside, and a runtime provides the boundary.
-
-### Sandbox orchestration
-
-> CRDs that make a sandbox a first-class resource — identity, storage, warm pools, pause and resume. Isolation is delegated to a runtime below.
+Projects that make a sandbox a first-class cluster resource. They do not isolate anything themselves — they pick a runtime from above and manage lifecycle, identity, and storage around it.
 
 - [agent-sandbox](https://github.com/kubernetes-sigs/agent-sandbox) - The emerging standard, under SIG Apps. Four CRDs give a sandbox stable identity, persistent storage, and a warm pool, while isolation is delegated to whichever RuntimeClass you point it at. ![any runtime](https://img.shields.io/badge/any%20runtime-0969da?style=flat-square) ![native CRDs, v0.x](https://img.shields.io/badge/native%20CRDs,%20v0.x-8b949e?style=flat-square) ![Google, Red Hat](https://img.shields.io/badge/Google,%20Red%20Hat-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/kubernetes-sigs/agent-sandbox?style=flat-square&label=%20)
 - [OpenSandbox](https://github.com/opensandbox-group/OpenSandbox) - A complete platform rather than a bare API: five language SDKs, an MCP server, a credential vault, and per-sandbox egress control, over either Docker or Kubernetes runtimes. ![any runtime](https://img.shields.io/badge/any%20runtime-0969da?style=flat-square) ![native CRDs](https://img.shields.io/badge/native%20CRDs-8b949e?style=flat-square) ![Alibaba](https://img.shields.io/badge/Alibaba-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/opensandbox-group/OpenSandbox?style=flat-square&label=%20)
@@ -47,22 +62,9 @@ Projects that integrate natively with a cluster, through CRDs or a `RuntimeClass
 - [OpenKruise Agents](https://github.com/openkruise/agents) - Ten CRDs extending the SIG API, plus an E2B-compatible server so existing E2B clients can target your own cluster. Note that pause deletes the Pod — in-memory state does not survive it. ![any runtime, unproven](https://img.shields.io/badge/any%20runtime,%20unproven-0969da?style=flat-square) ![10 CRDs](https://img.shields.io/badge/10%20CRDs-8b949e?style=flat-square) ![Alibaba Cloud](https://img.shields.io/badge/Alibaba%20Cloud-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/openkruise/agents?style=flat-square&label=%20)
 - [mitos](https://github.com/mitos-run/mitos) - Restores Firecracker VMs from memory snapshots in milliseconds and forks them on Kubernetes, aimed at fan-out workloads where every branch starts from the same warm state. ![separate kernel](https://img.shields.io/badge/separate%20kernel-1a7f37?style=flat-square) ![native CRDs](https://img.shields.io/badge/native%20CRDs-8b949e?style=flat-square) ![mitos-run](https://img.shields.io/badge/mitos--run-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/mitos-run/mitos?style=flat-square&label=%20)
 
-### Runtimes
-
-> The layer that actually provides the boundary. Most plug in through `RuntimeClass`; KubeVirt and Confidential Containers ship CRDs instead, which is a packaging difference, not a different tier.
-
-- [runc](https://github.com/opencontainers/runc) - The default container runtime, and the baseline this list measures against. Fine for code you wrote; a kernel bug is a host compromise. ![the default](https://img.shields.io/badge/the%20default-8b949e?style=flat-square) ![OCI](https://img.shields.io/badge/OCI-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/opencontainers/runc?style=flat-square&label=%20)
-- [Firecracker](https://github.com/firecracker-microvm/firecracker) - The microVM that created this category and still the leanest: a minimal device model, a few MB of overhead per VM, and the snapshot support that E2B and others build pause/resume on. Reaches Kubernetes as a Kata backend. ![125ms boot](https://img.shields.io/badge/125ms%20boot-8b949e?style=flat-square) ![AWS](https://img.shields.io/badge/AWS-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/firecracker-microvm/firecracker?style=flat-square&label=%20)
-- [Sysbox](https://github.com/nestybox/sysbox) - Hardened runc that gives each container its own user namespace and a virtualised `/proc`. Runs Docker-in-Docker and systemd safely — the strongest option that still shares a kernel. ![Docker-in-Docker safe](https://img.shields.io/badge/Docker--in--Docker%20safe-8b949e?style=flat-square) ![Docker](https://img.shields.io/badge/Docker-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/nestybox/sysbox?style=flat-square&label=%20)
-- [gVisor](https://github.com/google/gvisor) - The only production option in this tier. Its Sentry reimplements most of the Linux syscall surface in user space, so the host sees a fraction of the calls — and no virtualization is required. ![default on GKE](https://img.shields.io/badge/default%20on%20GKE-8b949e?style=flat-square) ![Google](https://img.shields.io/badge/Google-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/google/gvisor?style=flat-square&label=%20)
-- [Kata Containers](https://github.com/kata-containers/kata-containers) - Swappable VMM backends — QEMU, Firecracker, Cloud Hypervisor, Dragonball — behind a standard RuntimeClass, plus Intel TDX or AMD SEV-SNP when the host operator is in your threat model. ![most mature on K8s](https://img.shields.io/badge/most%20mature%20on%20K8s-8b949e?style=flat-square) ![OpenInfra](https://img.shields.io/badge/OpenInfra-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/kata-containers/kata-containers?style=flat-square&label=%20)
-- [Cloud Hypervisor](https://github.com/cloud-hypervisor/cloud-hypervisor) - Modern Rust VMM built for cloud workloads and commonly used as a Kata backend. Supports CPU and memory hotplug, which matters if you want to resize a sandbox rather than recreate it. ![Kata backend](https://img.shields.io/badge/Kata%20backend-8b949e?style=flat-square) ![Linux Foundation](https://img.shields.io/badge/Linux%20Foundation-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/cloud-hypervisor/cloud-hypervisor?style=flat-square&label=%20)
-- [KubeVirt](https://github.com/kubevirt/kubevirt) - Full virtual machines as CRDs rather than a RuntimeClass, with live migration and device passthrough. Heavy for a code sandbox, but the answer when the workload needs a desktop, a GPU, or Windows. ![separate kernel](https://img.shields.io/badge/separate%20kernel-1a7f37?style=flat-square) ![native CRDs, heavy](https://img.shields.io/badge/native%20CRDs,%20heavy-8b949e?style=flat-square) ![Red Hat](https://img.shields.io/badge/Red%20Hat-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/kubevirt/kubevirt?style=flat-square&label=%20)
-- [Confidential Containers](https://github.com/confidential-containers/operator) - An operator that pairs Kata with a hardware TEE, so sandbox memory is opaque to the host as well. For regulated workloads where the cloud provider sits outside the trust boundary. ![separate + TEE](https://img.shields.io/badge/separate%20%2B%20TEE-8250df?style=flat-square) ![native CRDs](https://img.shields.io/badge/native%20CRDs-8b949e?style=flat-square) ![Intel, IBM, Red Hat](https://img.shields.io/badge/Intel,%20IBM,%20Red%20Hat-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/confidential-containers/operator?style=flat-square&label=%20)
-
 ### Adjacent layers
 
-> Cluster-side projects that are often mistaken for sandboxes. Neither isolates a workload on its own.
+> Cluster-side projects often mistaken for sandboxes. Neither isolates a workload on its own; both are worth pairing with something that does.
 
 - [vCluster](https://github.com/loft-sh/vcluster) - Gives each tenant a virtual control plane with its own API server and CRDs. That isolates the control plane, not the workload — pair it with a real runtime rather than relying on it alone. ![control plane only](https://img.shields.io/badge/control%20plane%20only-6e7781?style=flat-square) ![Loft Labs](https://img.shields.io/badge/Loft%20Labs-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/loft-sh/vcluster?style=flat-square&label=%20)
 - [kagent](https://github.com/kagent-dev/kagent) - Kubernetes-native, but it orchestrates agents rather than isolating them — Agent, ModelConfig, and ToolServer CRDs, with isolation left to something else. Pairs with agent-sandbox rather than competing with it. ![not a sandbox](https://img.shields.io/badge/not%20a%20sandbox-6e7781?style=flat-square) ![pairs with agent-sandbox](https://img.shields.io/badge/pairs%20with%20agent--sandbox-8b949e?style=flat-square) ![Solo.io](https://img.shields.io/badge/Solo.io-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/kagent-dev/kagent?style=flat-square&label=%20)
@@ -91,8 +93,6 @@ Open source, and you can run it yourself — on a server, on a laptop, or on a c
 - [brood-box](https://github.com/stacklok/brood-box) - CLI for running coding agents inside hardware-isolated microVMs, with the secure path as the default rather than an opt-in. ![separate kernel](https://img.shields.io/badge/separate%20kernel-1a7f37?style=flat-square) ![your laptop](https://img.shields.io/badge/your%20laptop-8b949e?style=flat-square) ![Stacklok](https://img.shields.io/badge/Stacklok-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/stacklok/brood-box?style=flat-square&label=%20)
 - [Lima](https://github.com/lima-vm/lima) - Linux VMs on macOS with automatic filesystem and port forwarding. Not agent-specific, but the substrate several entries above are built on. ![separate kernel](https://img.shields.io/badge/separate%20kernel-1a7f37?style=flat-square) ![your laptop](https://img.shields.io/badge/your%20laptop-8b949e?style=flat-square) ![CNCF](https://img.shields.io/badge/CNCF-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/lima-vm/lima?style=flat-square&label=%20)
 - [container](https://github.com/apple/container) - Runs Linux containers as lightweight VMs on Apple silicon — one VM per container, on the native Virtualization framework. ![separate kernel](https://img.shields.io/badge/separate%20kernel-1a7f37?style=flat-square) ![your laptop](https://img.shields.io/badge/your%20laptop-8b949e?style=flat-square) ![Apple](https://img.shields.io/badge/Apple-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/apple/container?style=flat-square&label=%20)
-- [bubblewrap](https://github.com/containers/bubblewrap) - Unprivileged process sandboxing on namespaces and seccomp. A building block rather than a platform: both Flatpak and Anthropic's sandbox-runtime sit on top of it. ![engine under Flatpak](https://img.shields.io/badge/engine%20under%20Flatpak-8b949e?style=flat-square) ![Red Hat](https://img.shields.io/badge/Red%20Hat-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/containers/bubblewrap?style=flat-square&label=%20)
-- [nsjail](https://github.com/google/nsjail) - Namespaces, cgroups, rlimits, and seccomp-bpf behind one small binary. Common for CTF judges and untrusted build steps, where a full container runtime is overkill. ![single binary](https://img.shields.io/badge/single%20binary-8b949e?style=flat-square) ![Google](https://img.shields.io/badge/Google-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/google/nsjail?style=flat-square&label=%20)
 
 ## Managed Platforms
 

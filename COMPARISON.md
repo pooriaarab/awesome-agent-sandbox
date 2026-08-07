@@ -2,7 +2,7 @@
 
 Four dimensions per table: stars (live), who backs it, how it runs on Kubernetes, and how it isolates.
 
-**Isolation** uses the three tiers from [the README](README.md#isolation-tiers) — *shared kernel*, *intercepted kernel*, *separate kernel* — plus two variants: `+ TEE` for hardware confidential computing, and `WebAssembly` where there is no kernel at all. "Any" means the project delegates to a RuntimeClass and supports all three.
+**Isolation** uses the three tiers from [the README](README.md#isolation-runtimes) — *shared kernel*, *intercepted kernel*, *separate kernel* — plus two variants: `+ TEE` for hardware confidential computing, and `WebAssembly` where there is no kernel at all. "Any" means the project delegates to a RuntimeClass and supports all three.
 
 **Kubernetes** is stated plainly: *Native CRDs* (sandboxes are first-class resources), *Helm* (official manifests, no CRDs), *RuntimeClass* (it is a runtime, it plugs in), *Unofficial* (works, but not the documented path), or *None* (no self-hosting at all).
 
