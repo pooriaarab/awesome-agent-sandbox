@@ -8,12 +8,12 @@ Every entry is one sentence followed by three badges: **how it isolates**, **how
 
 ![shared kernel](https://img.shields.io/badge/shared%20kernel-d1242f?style=flat-square) weakest, shares the host kernel  ·  ![intercepted kernel](https://img.shields.io/badge/intercepted%20kernel-bf8700?style=flat-square) syscalls served in user space  ·  ![separate kernel](https://img.shields.io/badge/separate%20kernel-1a7f37?style=flat-square) strongest, own kernel in a VM  ·  ![any runtime](https://img.shields.io/badge/any%20runtime-0969da?style=flat-square) you choose  ·  ![separate + TEE](https://img.shields.io/badge/separate%20%2B%20TEE-8250df?style=flat-square) hides from the host too
 
-Star badges are live. Full side-by-side tables are in [COMPARISON.md](COMPARISON.md), including an [On Kubernetes](COMPARISON.md#on-kubernetes) view of which layer each project occupies.
+Star badges are live. Full side-by-side tables are in [COMPARISON.md](COMPARISON.md), with per-dimension tables for every section.
 
 ## Contents
 
 - [Isolation Runtimes](#isolation-runtimes)
-- [Kubernetes-Native Sandbox Orchestrators](#kubernetes-native-sandbox-orchestrators)
+- [On Kubernetes](#on-kubernetes)
 - [Self-Hosted Sandboxes](#self-hosted-sandboxes)
 - [Managed Platforms](#managed-platforms)
 - [Related Projects](#related-projects)
@@ -60,11 +60,22 @@ Entries in this section carry a distinguishing fact instead of an isolation badg
 
 WebAssembly is a fourth option on a different axis: no kernel to escape, but no arbitrary Linux binaries either. See [runwasi](https://github.com/containerd/runwasi) and [WasmEdge](https://github.com/WasmEdge/WasmEdge).
 
-## Kubernetes-Native Sandbox Orchestrators
+## On Kubernetes
 
-Projects that make a **sandbox** a first-class Kubernetes resource, with CRDs of its own. They do not isolate anything themselves — they pick a runtime from above and manage lifecycle, identity, and storage around it. Runtimes that happen to ship a CRD, like KubeVirt, belong in the section above.
+Everything here that installs into a cluster, and which layer it occupies. These **stack rather than compete**: an agent orchestrator decides what runs, a sandbox orchestrator decides what it runs inside, and a runtime provides the boundary.
 
-Frameworks that orchestrate *agents* rather than sandboxes are under Related Projects.
+| Layer                     | Projects                                                              | Plugs in as    | Isolation                                        |
+| ------------------------- | --------------------------------------------------------------------- | -------------- | ------------------------------------------------ |
+| Agent orchestration       | kagent                                                                | CRDs           | None — pair it with a sandbox                    |
+| **Sandbox orchestration** | **agent-sandbox, OpenSandbox, CubeSandbox, OpenKruise Agents, mitos** | CRDs           | Delegated to the runtime below                   |
+| Control plane             | vCluster                                                              | CRDs           | None — isolates the API server, not the workload |
+| Runtime                   | runc, Sysbox, gVisor, Kata, Cloud Hypervisor                          | `RuntimeClass` | Shared → intercepted → separate kernel           |
+| Runtime                   | KubeVirt, Confidential Containers                                     | CRDs           | Separate kernel, `+ TEE`                         |
+| Managed, on your cluster  | GKE Agent Sandbox, Northflank                                         | Vendor install | Intercepted / separate kernel                    |
+
+A runtime that ships CRDs is still a runtime — the packaging differs, the layer does not. That is why KubeVirt sits with Kata above, not with agent-sandbox below.
+
+The rows in bold are listed here. Runtimes are in the section above; kagent and vCluster are under Related Projects.
 
 - [agent-sandbox](https://github.com/kubernetes-sigs/agent-sandbox) - The emerging standard, under SIG Apps. Four CRDs give a sandbox stable identity, persistent storage, and a warm pool, while isolation is delegated to whichever RuntimeClass you point it at. ![any runtime](https://img.shields.io/badge/any%20runtime-0969da?style=flat-square) ![native CRDs, v0.x](https://img.shields.io/badge/native%20CRDs,%20v0.x-8b949e?style=flat-square) ![Google, Red Hat](https://img.shields.io/badge/Google,%20Red%20Hat-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/kubernetes-sigs/agent-sandbox?style=flat-square&label=%20)
 - [OpenSandbox](https://github.com/opensandbox-group/OpenSandbox) - A complete platform rather than a bare API: five language SDKs, an MCP server, a credential vault, and per-sandbox egress control, over either Docker or Kubernetes runtimes. ![any runtime](https://img.shields.io/badge/any%20runtime-0969da?style=flat-square) ![native CRDs](https://img.shields.io/badge/native%20CRDs-8b949e?style=flat-square) ![Alibaba](https://img.shields.io/badge/Alibaba-4a5568?style=flat-square) ![Stars](https://img.shields.io/github/stars/opensandbox-group/OpenSandbox?style=flat-square&label=%20)
