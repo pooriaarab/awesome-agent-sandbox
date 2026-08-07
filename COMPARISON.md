@@ -14,8 +14,9 @@ Four dimensions per table: stars (live), who backs it, how it runs on Kubernetes
 | [gVisor](https://github.com/google/gvisor) | ![](https://img.shields.io/github/stars/google/gvisor?style=flat-square&label=%20) | Google | RuntimeClass, native on GKE | Intercepted kernel |
 | [Kata Containers](https://github.com/kata-containers/kata-containers) | ![](https://img.shields.io/github/stars/kata-containers/kata-containers?style=flat-square&label=%20) | OpenInfra Foundation | RuntimeClass, most mature | Separate kernel, `+ TEE` available |
 | [Cloud Hypervisor](https://github.com/cloud-hypervisor/cloud-hypervisor) | ![](https://img.shields.io/github/stars/cloud-hypervisor/cloud-hypervisor?style=flat-square&label=%20) | Linux Foundation | RuntimeClass, via Kata | Separate kernel |
+| [KubeVirt](https://github.com/kubevirt/kubevirt) | ![](https://img.shields.io/github/stars/kubevirt/kubevirt?style=flat-square&label=%20) | Red Hat (CNCF) | Native CRDs | Separate kernel, full VM |
+| [Confidential Containers](https://github.com/confidential-containers/operator) | ![](https://img.shields.io/github/stars/confidential-containers/operator?style=flat-square&label=%20) | Intel, IBM, Red Hat, Ant (CNCF) | Native CRDs | Separate kernel `+ TEE` |
 | [Sysbox](https://github.com/nestybox/sysbox) | ![](https://img.shields.io/github/stars/nestybox/sysbox?style=flat-square&label=%20) | Docker | RuntimeClass | Shared kernel, hardened |
-| [Edera Protect](https://edera.dev/) | — core closed | Edera | RuntimeClass | Separate kernel, no hardware virtualization needed |
 | [runc](https://github.com/opencontainers/runc) | ![](https://img.shields.io/github/stars/opencontainers/runc?style=flat-square&label=%20) | OCI | RuntimeClass, default | Shared kernel |
 | [bubblewrap](https://github.com/containers/bubblewrap) | ![](https://img.shields.io/github/stars/containers/bubblewrap?style=flat-square&label=%20) | Red Hat / Flatpak | Unofficial | Shared kernel |
 | [nsjail](https://github.com/google/nsjail) | ![](https://img.shields.io/github/stars/google/nsjail?style=flat-square&label=%20) | Google | Unofficial | Shared kernel |
@@ -30,8 +31,6 @@ Four dimensions per table: stars (live), who backs it, how it runs on Kubernetes
 | [OpenSandbox](https://github.com/opensandbox-group/OpenSandbox) | ![](https://img.shields.io/github/stars/opensandbox-group/OpenSandbox?style=flat-square&label=%20) | Alibaba | Native CRDs | Any |
 | [CubeSandbox](https://github.com/TencentCloud/CubeSandbox) | ![](https://img.shields.io/github/stars/TencentCloud/CubeSandbox?style=flat-square&label=%20) | Tencent Cloud | Native CRDs, or no cluster at all | Intercepted or separate kernel |
 | [OpenKruise Agents](https://github.com/openkruise/agents) | ![](https://img.shields.io/github/stars/openkruise/agents?style=flat-square&label=%20) | Alibaba Cloud (CNCF OpenKruise) | Native CRDs | Any, but unproven — see below |
-| [KubeVirt](https://github.com/kubevirt/kubevirt) | ![](https://img.shields.io/github/stars/kubevirt/kubevirt?style=flat-square&label=%20) | Red Hat (CNCF) | Native CRDs | Separate kernel, full VM |
-| [Confidential Containers](https://github.com/confidential-containers/operator) | ![](https://img.shields.io/github/stars/confidential-containers/operator?style=flat-square&label=%20) | Intel, IBM, Red Hat, Ant (CNCF) | Native CRDs | Separate kernel `+ TEE` |
 | [vCluster](https://github.com/loft-sh/vcluster) | ![](https://img.shields.io/github/stars/loft-sh/vcluster?style=flat-square&label=%20) | Loft Labs | Native CRDs | Control plane only — stack it with a real runtime |
 | [mitos](https://github.com/mitos-run/mitos) | ![](https://img.shields.io/github/stars/mitos-run/mitos?style=flat-square&label=%20) | mitos-run | Native CRDs | Separate kernel |
 
